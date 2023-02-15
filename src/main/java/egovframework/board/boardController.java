@@ -49,6 +49,58 @@ public class boardController {
 		
 		try {
 			String fileName = upload.getOriginalFilename();
+			System.out.println(""+fileName+"");
+			byte[] bytes = upload.getBytes();
+			
+			String path = "C:\\cR\\eGovFrameDev-3.8.0-64bit\\workspace\\ckeditor\\src\\main\\webapp\\resources\\ckimage\\";
+			String ckUploadPath = path+fileName;
+			File foler = new File(path); 
+			System.out.println("path" + path);
+			
+			if(!foler.exists()) {
+				try {
+					foler.mkdir();
+				}catch(Exception e) {
+					e.getStackTrace();
+				}
+			}
+			
+			out = new FileOutputStream(new File(ckUploadPath));
+			out.write(bytes);
+			out.flush();
+			
+			String callback = request.getParameter("CKEditorFuncNum");
+			printWriter = response.getWriter();
+	    	String fileUrl = "/ckImgSubmit.do?fileName=" + fileName; 
+	    	
+	    	// 업로드시 메시지 출력
+	    	printWriter.println("{\"filename\" : \""+fileName+"\", \"uploaded\" : 1, \"url\":\""+fileUrl+"\"}");
+	    	printWriter.flush();
+	    	
+		}catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+    		try {
+    		if(out != null) { out.close(); }
+    		if(printWriter != null) { printWriter.close(); }
+    	} catch(Exception e) { e.printStackTrace(); }
+    	}
+    	return;
+		
+	}
+	
+	/*@RequestMapping(value="fileupload.do")
+	public void fileupload(HttpServletRequest request, HttpServletResponse response, MultipartHttpServletRequest multiFile
+			,@RequestParam MultipartFile upload) throws Exception {
+		
+		OutputStream out = null;
+		PrintWriter printWriter = null;
+		
+		response.setCharacterEncoding("utf-8");
+		response.setContentType("text/html; charset=utf-8");
+		
+		try {
+			String fileName = upload.getOriginalFilename();
 			System.out.println(":::::::::::"+fileName+"::::::::::::::::::::");
 			byte[] bytes = upload.getBytes();
 			
@@ -87,8 +139,8 @@ public class boardController {
     	}
     	return;
 		
-	}
-	@RequestMapping(value="/ckImgSubmit.do")
+	}*/
+	/*@RequestMapping(value="/ckImgSubmit.do")
     public void ckSubmit( @RequestParam(value="fileName") String fileName
     		, HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException{
@@ -101,6 +153,54 @@ public class boardController {
     	File imgFile = new File(sDirPath);
     	
     	//사진 이미지 찾지 못하는 경우 예외처리로 빈 이미지 파일을 설정한다.
+    	if(imgFile.isFile()){
+    		byte[] buf = new byte[1024];
+    		int readByte = 0;
+    		int length = 0;
+    		byte[] imgBuf = null;
+    		
+    		FileInputStream fileInputStream = null;
+    		ByteArrayOutputStream outputStream = null;
+    		ServletOutputStream out = null;
+    		
+    		try{
+    			fileInputStream = new FileInputStream(imgFile);
+    			outputStream = new ByteArrayOutputStream();
+    			out = response.getOutputStream();
+    			
+    			while((readByte = fileInputStream.read(buf)) != -1){
+    				outputStream.write(buf, 0, readByte); 
+    			}
+    			
+    			imgBuf = outputStream.toByteArray();
+    			length = imgBuf.length;
+    			out.write(imgBuf, 0, length);
+    			out.flush();
+    			System.out.println(fileName);
+    			
+    		}catch(IOException e){
+    			e.printStackTrace();
+    		}finally {
+    			outputStream.close();
+    			fileInputStream.close();
+    			out.close();
+    			}
+    		}
+    }*/
+	
+	@RequestMapping(value="/ckImgSubmit.do")
+    public void ckSubmit( @RequestParam(value="fileName") String fileName
+    		, HttpServletRequest request, HttpServletResponse response)
+    throws ServletException, IOException{
+    	
+    	
+    	String path = "C:\\cR\\eGovFrameDev-3.8.0-64bit\\workspace\\ckeditor\\src\\main\\webapp\\resources\\ckimage\\";	
+    	System.out.println("path"+path);
+    	String sDirPath = path + fileName;
+    	
+    	File imgFile = new File(sDirPath);
+    	
+ 
     	if(imgFile.isFile()){
     		byte[] buf = new byte[1024];
     		int readByte = 0;
